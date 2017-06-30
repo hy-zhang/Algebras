@@ -7,9 +7,11 @@ exr = snd
 inl = Inl
 inr = Inr
 
+-- fork (unfold)
 (/\) :: (a -> b) -> (a -> c) -> (a -> b |*| c)
 f /\ g = \x -> (f x, g x)
 
+-- join (fold)
 (\/) :: (a -> c) -> (b -> c) -> (a |+| b -> c)
 f \/ g = \x -> case x of
   Inl l -> f l
@@ -47,3 +49,15 @@ guard p = (exl |+| exl) . distl . (id /\ p)
 
 ifCond :: (a -> MyBool) -> (a -> b) -> (a -> b) -> (a -> b)
 ifCond p f g = (f \/ g) . guard p
+
+-- Monomorphic datatypes
+
+data IntList = Nil | Cons Int IntList
+
+-- T = DATA F
+-- F X = 1 + Int * X
+-- f :: A -> B  ==>  F f :: F A -> F B
+-- F f (Inl ()) = Inl ()
+-- F f (Inr (intI, a)) = Inr (intI, f a)
+
+-- Question: composition of coalgebras on extensible datatypes?
